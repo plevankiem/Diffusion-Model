@@ -1,0 +1,41 @@
+[project]
+name = "diffusion-model"
+version = "0.1.0"
+description = "Template repository for implementing a diffusion model with a professional, modular structure."
+authors = [
+  { name = "Your Name", email = "you@example.com" },
+]
+requires-python = ">=3.10"
+dependencies = [
+  "torch",
+  "torchvision",
+  "numpy",
+  "pyyaml",
+  "tqdm",
+  "pytest",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.optional-dependencies]
+dev = [
+  "pytest-cov",
+  "black",
+  "isort",
+  "mypy",
+]
+logging = [
+  "tensorboard",
+  "wandb",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+
+
