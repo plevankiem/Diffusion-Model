@@ -35,5 +35,6 @@ logs/
 runs/
 outputs/
 checkpoints/
+raw/
 
 
