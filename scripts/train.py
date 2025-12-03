@@ -74,6 +74,7 @@ def create_dataloaders(
     quick_test: bool = False,
     num_train_samples: int = 100,
     num_test_samples: int = 50,
+    dataset_path: Optional[str] = None,
 ) -> Dict[str, DataLoader]:
     """
     Create dataloaders for training and testing.
@@ -86,6 +87,7 @@ def create_dataloaders(
         quick_test: If True, use limited samples for quick testing
         num_train_samples: Number of training samples for quick test
         num_test_samples: Number of test samples for quick test
+        dataset_path: Optional direct path to dataset (if provided, equivalent to data_root/raw/{dataset_name})
     
     Returns:
         Dictionary of dataloaders
@@ -102,6 +104,7 @@ def create_dataloaders(
         root=data_root,
         transforms_by_split=transforms_by_split,
         image_size=image_size,
+        dataset_path=dataset_path,
     )
     
     # Limit datasets for quick test if requested
@@ -128,6 +131,7 @@ def main():
     # Dataset arguments
     parser.add_argument("--dataset", type=str, default="cifar10", help="Dataset name (default: cifar10)")
     parser.add_argument("--data-root", type=str, default="src/diffusion_model/data", help="Data root directory")
+    parser.add_argument("--dataset-path", type=str, default=None, help="Direct path to dataset (if provided, equivalent to data-root/raw/{dataset-name})")
     parser.add_argument("--image-size", type=int, default=None, help="Image size (None for dataset default)")
     
     # Model arguments
@@ -197,6 +201,7 @@ def main():
         quick_test=args.quick_test,
         num_train_samples=args.num_train_samples,
         num_test_samples=args.num_test_samples,
+        dataset_path=args.dataset_path,
     )
     
     # Get sample batch to determine image shape

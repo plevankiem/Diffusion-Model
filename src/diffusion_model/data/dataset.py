@@ -26,6 +26,7 @@ class DatasetConfig:
 
     # Paramètres optionnels communs
     image_size: Optional[int] = None
+    dataset_path: Optional[Union[str, Path]] = None  # Si rempli, correspond à root/"raw"/{dataset_name}
 
 
 def _build_cifar10(
@@ -47,9 +48,12 @@ def _build_cifar10(
         )
 
     is_train = cfg.split == "train"
-    # Les données sont dans root/raw/cifar10/
+    # Les données sont dans root/raw/cifar10/ ou dans dataset_path si fourni
     # torchvision CIFAR10 s'attend à trouver cifar-10-batches-py/ dans le dossier root
-    dataset_root = Path(cfg.root) / "raw" / "cifar10"
+    if cfg.dataset_path is not None:
+        dataset_root = Path(cfg.dataset_path)
+    else:
+        dataset_root = Path(cfg.root) / "raw" / "cifar10"
     
     if not dataset_root.exists():
         raise FileNotFoundError(
@@ -135,8 +139,11 @@ def _build_celeba(
             "Utilisez 'train' ou 'test'."
         )
     
-    # Les données sont dans root/raw/celeba/{split}/
-    split_dir = Path(cfg.root) / "raw" / "celeba" / cfg.split
+    # Les données sont dans root/raw/celeba/{split}/ ou dans dataset_path/{split}/ si fourni
+    if cfg.dataset_path is not None:
+        split_dir = Path(cfg.dataset_path) / cfg.split
+    else:
+        split_dir = Path(cfg.root) / "raw" / "celeba" / cfg.split
     
     if not split_dir.exists():
         raise FileNotFoundError(
@@ -235,12 +242,14 @@ def create_train_val_test_datasets(
     root: Union[str, Path],
     transforms_by_split: Dict[DatasetSplit, Callable],
     image_size: Optional[int] = None,
+    dataset_path: Optional[Union[str, Path]] = None,
 ) -> Dict[DatasetSplit, Dataset]:
     """Crée un dictionnaire {\"train\", \"val\", \"test\"} de datasets.
 
     - `transforms_by_split` doit contenir au minimum une clé \"train\".
     - Si \"val\" ou \"test\" ne sont pas fournis, ils seront ignorés.
     - Les données sont chargées depuis root/raw/{dataset_name}/, pas de téléchargement.
+    - Si `dataset_path` est fourni, il sera utilisé directement (équivalent à root/raw/{dataset_name}).
     """
     datasets_dict: Dict[DatasetSplit, Dataset] = {}
 
@@ -253,6 +262,7 @@ def create_train_val_test_datasets(
             root=root,
             split=split,  # type: ignore[arg-type]
             image_size=image_size,
+            dataset_path=dataset_path,
         )
         ds = create_dataset(cfg, transform=transforms_by_split[split])
         datasets_dict[split] = ds
