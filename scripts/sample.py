@@ -179,7 +179,8 @@ def main():
     
     # First, we need to create a dummy model to load the checkpoint
     # We'll get config from checkpoint if available
-    checkpoint = torch.load(args.checkpoint, map_location=device)
+    # Use weights_only=False to allow loading custom dataclasses (safe for our own checkpoints)
+    checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
     
     # Extract configs from checkpoint
     if "model_config" in checkpoint:
