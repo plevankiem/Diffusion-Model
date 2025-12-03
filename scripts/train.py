@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader, Subset
 from src.diffusion_model.models.unet import UNetModel, ModelConfig
 from src.diffusion_model.schedulers.ddpm_scheduler import DDPMScheduler, DDPMSchedulerConfig
 from src.diffusion_model.training.train_pipeline import TrainingPipieline, TrainingConfig
-from src.diffusion_model.data.dataset import create_train_val_test_datasets
+from src.diffusion_model.data.dataset import create_train_val_test_datasets, get_default_image_size
 from src.diffusion_model.data.transforms import build_transform_for_split
 from src.diffusion_model.utils.checkpoint import save_checkpoint
 
@@ -101,7 +101,6 @@ def create_dataloaders(
         name=dataset_name,
         root=data_root,
         transforms_by_split=transforms_by_split,
-        download=True,
         image_size=image_size,
     )
     
@@ -184,12 +183,9 @@ def main():
     checkpoint_dir = Path(args.checkpoint_dir)
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     
-    # Determine image size (CIFAR-10 is 32x32)
+    # Set default image size based on dataset if not provided
     if args.image_size is None:
-        if args.dataset.lower() == "cifar10":
-            args.image_size = 32
-        else:
-            args.image_size = 32  # Default
+        args.image_size = get_default_image_size(args.dataset, root=args.data_root)
     
     # Create dataloaders
     print(f"Creating dataloaders for dataset: {args.dataset}")
